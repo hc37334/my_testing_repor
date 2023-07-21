@@ -1,0 +1,397 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:t="http://myfaces.apache.org/tomahawk"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:sdc="http://www.maximus.com/sdc/jsf">
+<!-- BEGIN PAGES/COMPLAINTS/COMPLAINTS.xhtml -->
+	<div class="section-group">
+		<sdc:section id="complaints_search" title="#{msg.complaints_complaints_search}">
+			<div class="clear">
+				<sdc:subsection id="complaints_search_criteria" title="#{msg.complaints_search_criteria}" showCollapseExpandControl="false">
+					<ui:include src="/pages/complaints/complaints_search_criteria.xhtml"/>
+				</sdc:subsection>
+			</div>
+			<div class="clear">
+				<sdc:subsection id="incident_headers_search_results" title="#{msg.complaints_search_results}" showCollapseExpandControl="false">
+					<ui:include src="/pages/complaints/complaints_search_results.xhtml"/>
+					<h:panelGroup rendered="#{showReadOnly != 'true'}" >
+						<div class="button-set">
+							<p:fragment>
+								<sdc:commandButton eventName="createNewIncidentHeader" value="#{msg.complaints_new_complaint}" backingBean="#{isearchBean}" actionMethod="createNewIncidentHeader" immediate="true" focusToId="selected_complaint_form:stateReceivedDate" permission="section.selected_complaint.create"/>
+							</p:fragment>
+						</div>
+					</h:panelGroup>
+				</sdc:subsection>
+			</div>
+			<sdc:focusForSection focusId="caseId"/>
+		</sdc:section>
+		<sdc:section id="selected_complaint" title="#{msg.complaints_complaint} ##{ihcBean.incidentHeader.trackingNumber}" rendered="#{not empty ihcBean.incidentHeader}">
+			<ui:include src="/pages/complaints/complaint_details.xhtml"/>
+		</sdc:section>
+		<sdc:section id="selected_incident_issue" title="#{msg.complaints_add_edit_issue_for_complaint} ##{ihcBean.incidentHeader.trackingNumber}" rendered="#{not empty ihcBean.selectedIncidentIssue}">
+			<ui:include src="/pages/complaints/complaints_incident_issue.xhtml"/>
+			<sdc:focusForSection focusId="issueDescription"/>
+		</sdc:section>
+		<sdc:section id="selected_incident_status_history" title="#{msg.complaints_status_history_for_complaint} ##{ihcBean.incidentHeader.trackingNumber}" rendered="#{not empty ihcBean.incidentHeader}">
+			<ui:include src="/pages/complaints/complaints_status_history.xhtml"/>
+		</sdc:section>
+		<sdc:section id="complaint_client_enrollment_history" title="#{msg.enrollment_history_title} - #{ihcBean.selectedClient.extClientId} #{ihcBean.selectedClient.lastName}, #{ihcBean.selectedClient.firstName}">
+			<ui:include src="/pages/enrollment/enrollmentSelectionHistory.xhtml">
+				<ui:param name="param_selected_client_history" value="#{ihcBean.selectedClientEnrollmentHistory}" />
+				<ui:param name="param_select_event_name" value="complaintSelectEnrollmentHistory"/>
+				<ui:param name="param_select_backing_bean" value="#{ihcBean}"/>
+				<ui:param name="param_select_action_bean" value="selectEnrollmentHistory"/>
+				<ui:param name="param_show_select_link" value="true"/>
+				<ui:param name="param_hide_missing_info_link" value="true"/>
+			</ui:include>
+			<div class="button-set">
+				<p:fragment>
+					<sdc:commandButton id="enrollment_history_close_history_1" eventName="complaintCancelEnrollmentHistory" value="#{msg.enrollment_history_close_history}" />
+				</p:fragment>
+			</div>
+		</sdc:section>
+
+		<sdc:section id="complaint_warning" title="#{msg.duplicate_complaint_section_title}" >
+			<div class="">
+				<sdc:outputText id="complaint_confirm_label" value="#{msg.complaint_confirm_label}" />
+				<sdc:simpleDataTable id="complaint_confirm_data" value="#{ihcBean.duplicateComplaints}" >
+					<h:column>
+						<f:facet name="header">#{msg.complaints_tracking_nbr}</f:facet>
+						#{row.trackingNumber}&#160;
+					</h:column>
+					<h:column>
+						<f:facet name="header">#{msg.complaints_type}</f:facet>
+						<sdc:selectOneMenu value="#{row.incidentHeaderTypeCd}" displayValueOnly="true" selectItems="#{code.EnumIncidentHeaderType}" />&#160;
+					</h:column>
+					<h:column>
+						<f:facet name="header">#{msg.complaints_status}</f:facet>
+						<sdc:selectOneMenu value="#{row.statusCd}" displayValueOnly="true" selectItems="#{code.EnumIncidentHeaderStatus}" />&#160;
+					</h:column>
+					<h:column>
+						<f:facet name="header">#{msg.complaints_status_date}</f:facet>
+						<sdc:outputDate value="#{row.statusTs}" type="both"/>&#160;
+					</h:column>
+					<h:column>
+						<f:facet name="header">#{msg.complaints_date_received}</f:facet>
+						<sdc:outputDate value="#{row.receivedTs}" type="date"/>&#160;
+					</h:column>
+					<h:column>
+						<f:facet name="header">#{msg.complaints_complaint_about}</f:facet>
+						<sdc:selectOneMenu value="#{row.affectedPartyTypeCd}" displayValueOnly="true" selectItems="#{code.EnumAffectedPartyType}"/>&#160;
+					</h:column>
+					<h:column>
+						<f:facet name="header">#{msg.complaints_complaint_reason}</f:facet>
+						<sdc:selectOneMenu value="#{row.affectedPartySubtypeCd}" displayValueOnly="true" selectItems="#{code.EnumAffectedPartySubtype}"/>&#160;
+					</h:column>
+	                <h:column rendered="#{configPropertyBean.show_fair_hearing_tracking_nbr_field == 'true'}">
+	                    <f:facet name="header">#{msg.complaints_fair_hearing_tracking_nbr}</f:facet>
+	                    <sdc:outputText value="#{row.fairHearingTrackingNbr}"/>
+	                </h:column>
+				</sdc:simpleDataTable>
+			</div>
+			<div class="button-set">
+       			<sdc:gotoCommandButton id="comp_confirm_save" value="#{msg.complaint_confirm_save_button}" backingBean="#{ihcBean}"  actionMethod="saveConfirm"  immediate="true"  />&#160;&#160;
+		    	<sdc:commandButton id="comp_confirm_return" value="#{msg.complaints_cancel}" eventName="createNewIncidentHeaderSinceNoResults"    immediate="true"   />
+		    </div>
+		</sdc:section>
+
+	</div>
+	<sdc:modal id="complaint_case_search_modal">
+	<sdc:section id="complaints_case_search" title="#{msg.complaints_case_search_for_complaint} ##{ihcBean.incidentHeader.trackingNumber}">
+		<div class="clear indentLevelOne">
+			<sdc:subsection id="complaints_case_search_criteria" title="#{msg.complaints_search_criteria}" >
+				<ui:include src="/pages/eligibility/participant_search_criteria.xhtml">
+					<ui:param name="param_search_event_name" value="searchCasesForComplaint"/>
+					<ui:param name="param_participant_search_reset_event" value="showSearchCasesForComplaint"/>
+					<ui:param name="param_modal_id" value="complaint_case_search_modal"/>
+				</ui:include>
+			</sdc:subsection>
+		</div>
+		<div class="clear indentLevelOne">
+			<sdc:subsection id="complaints_case_search_results" title="#{msg.complaints_search_results}" >
+				<ui:include src="/pages/eligibility/participant_search_results_inc.xhtml">
+					<ui:param name="param_case_select_event_name" value="caseSelectedFromCaseSearchForComplaint"/>
+					<ui:param name="param_case_select_bean" value="#{ihcBean}"/>
+					<ui:param name="param_case_select_action_method" value="selectCaseFromCaseSearch"/>
+					<ui:param name="param_modal_id" value="complaint_case_search_modal"/>
+				</ui:include>
+			</sdc:subsection>
+		</div>
+		<div class="clear indentLevelOne">
+		</div>
+	</sdc:section>
+	</sdc:modal>
+	<sdc:modal id="complaints_case_family_members_modal">
+	<sdc:section id="complaints_case_family_members" title="#{msg.complaints_family_members_for_case} ##{eligibilityBean.selectedCase.extCaseId}">
+		<ui:include src="/pages/eligibility/case_family_members.xhtml">
+            <ui:param name="param_id" value="complaints_case_family_members_table"/>
+			<ui:param name="param_family_member_data_model" value="#{ihcBean.quickSearchCaseFamilyMembersDataModel}"/>
+			<ui:param name="param_family_member_select_event_name" value="clientSelectedFromCaseFamilyMembersForComplaint"/>
+			<ui:param name="param_family_member_select_bean" value="#{ihcBean}"/>
+			<ui:param name="param_family_member_select_action_method" value="selectClientFromCaseFamilyMembers"/>
+            <ui:param name="param_hide_set_caller_link" value="true"/>
+			<ui:param name="param_modal_id" value="complaints_case_family_members_modal"/>
+		</ui:include>
+	</sdc:section>
+	</sdc:modal>
+	<sdc:modal id="complaints_plan_search_modal">
+	<sdc:section id="complaints_plan_search" title="#{msg.complaints_plan_search_for_complaint} ##{ihcBean.incidentHeader.trackingNumber}">
+		<div class="clear">
+			<sdc:subsection id="complaints_plan_search_criteria" title="#{msg.complaints_search_criteria}" showCollapseExpandControl="false">
+				<ui:include src="/pages/plan/planSearchCriteria.xhtml">
+					<ui:param name="param_plan_selection_criteria" value="#{planBean.planSelectionCriteria}" />
+					<ui:param name="param_show_plan_type" value="true" />
+					<ui:param name="param_show_plan_type_readonly" value="false" />
+					<ui:param name="param_backing_bean" value="#{planBean}"/>
+					<ui:param name="param_modal_id" value="complaints_plan_search_modal"/>
+				</ui:include>
+				<div class="button-set">
+					<sdc:commandButton defaultButton="true" value="#{msg.complaints_search}" eventName="searchPlansForComplaint" backingBean="#{planBean}" actionMethod="simplePlanSearch"/>
+					 <sdc:commandButton id="complaints_reset_m_2" value="#{msg.complaints_reset}" eventName="complaintsPlanReset" backingBean="#{planBean}" actionMethod="reset"/>
+					 
+				</div>
+			</sdc:subsection>
+		</div>
+		<div class="clear">
+			<sdc:subsection id="complaints_plan_search_results" title="#{msg.complaints_search_results}">
+				<ui:include src="/pages/plan/planSearchResults.xhtml">
+					<ui:param name="param_plan_search_results_datamodel" value="#{planBean.dataModel}" />
+					<ui:param name="param_show_plan_selection_column" value="true" />
+					<ui:param name="param_selection_event_name" value="planSelectedFromPlanSearchForComplaint" />
+					<ui:param name="param_selection_action_bean" value="#{ihcBean}" />
+					<ui:param name="param_selection_action_method" value="selectPlanFromPlanSearch" />
+					<ui:param name="param_hide_plan_contract_info" value="true" />
+					<ui:param name="param_modal_id" value="complaints_plan_search_modal"/>
+				</ui:include>
+			</sdc:subsection>
+		</div>
+	</sdc:section>
+	</sdc:modal>
+	<sdc:modal id="complaints_provider_search_modal">
+	<sdc:section id="complaints_provider_search" title="#{msg.complaints_provider_search_for_complaint} ##{ihcBean.incidentHeader.trackingNumber}">
+		<div class="clear">
+			<sdc:subsection id="complaints_provider_search_criteria" title="#{msg.complaints_criteria}">
+                <t:div style="text-align: right">
+                        <sdc:commandLink id="prv_sw_adv_srch" eventName="complaints_provider_switch_search_type" value="#{msg.switch_to_advanced_search}"  backingBean="#{networkBean}" actionMethod="activateAdvancedSearch" rendered="#{not networkBean.advancedSearch}" focusToId="provider_provider_search_criteria_form:provider_search_criteria_provider_first_name" />&#160;&#160;
+                        <sdc:commandLink id="prv_sw_basic_srch" eventName="complaints_provider_switch_search_type" value="#{msg.switch_to_basic_search}"  backingBean="#{networkBean}" actionMethod="deActivateAdvancedSearch" rendered="#{networkBean.advancedSearch}" focusToId="provider_provider_search_criteria_form:provider_search_criteria_provider_first_name" />&#160;&#160;
+                </t:div>
+				<ui:include src="/pages/provider/providerSearchCriteria.xhtml">
+					<ui:param name="paramSelectionCriteria" value="#{networkBean.networkSelectionCriteria}"></ui:param>
+				</ui:include>
+
+				<t:div style="text-align: right">
+	                <sdc:commandLink id="show_alt_address" eventName="complaints_provider_switch_search_type" value="#{msg.link_use_alt_address}"  backingBean="#{networkBean}" actionMethod="enableAlternateAddress" rendered="#{(networkBean.advancedSearch) and (configPropertyBean.display_distance_search == true) and (not networkBean.networkSelectionCriteria.enableAltAddress)}"/>&#160;&#160;
+	             	<sdc:commandLink id="hide_alt_address" eventName="complaints_provider_switch_search_type" value="#{msg.link_rem_alt_address}"  backingBean="#{networkBean}" actionMethod="disableAlternateAddress" rendered="#{(networkBean.advancedSearch) and (configPropertyBean.display_distance_search == true) and (networkBean.networkSelectionCriteria.enableAltAddress)}"/>&#160;&#160;
+		         </t:div>
+
+				<ui:include src="/pages/provider/provider_search_alt_address.xhtml">
+					<ui:param name="paramSelectionCriteria" value="#{networkBean.networkSelectionCriteria}"></ui:param>
+				</ui:include>
+
+				<div class="button-set">
+					<sdc:commandButton defaultButton="true" value="#{msg.complaints_search}" eventName="complaintsProviderSearch" backingBean="#{networkBean}" actionMethod="providerSearch"/>
+					 
+						<sdc:commandButton id="complaints_reset_m_3" value="#{msg.complaints_reset}" eventName="complaintsProviderReset" backingBean="#{networkBean}" actionMethod="resetButtonAction"/>
+					 
+				</div>
+			</sdc:subsection>
+		</div>
+		<div class="clear">
+			<sdc:subsection id="complaints_provider_search_results" title="#{msg.complaints_results}">
+				<ui:include src="/pages/complaints/complaints_providerSearchResults.xhtml">
+					<ui:param name="provider_results_hide_details" value="true" />
+					<ui:param name="param_provider_results_hide_select" value="true"/>
+					<ui:param name="provider_results_selection_backing_bean" value="#{ihcBean}" />
+					<ui:param name="provider_results_selection_action_method" value="selectProviderFromProviderSearch" />
+					<ui:param name="param_provider_search_results_selection_message" value="#{msg.action_select}" />
+					<ui:param name="provider_results_selection_event_name" value="providerSelectedFromProviderSearchForComplaint" />
+					<ui:param name="param_provider_search_tag_enabled" value="false"/>
+					<ui:param name="param_modal_id" value="complaints_provider_search_modal"/>
+					<ui:param name="search_results_details_section_id" value="comp_provider_search_results_details" />
+                    <ui:param name="param_provider_provider_search_results_details" value="complaints_provider_search_results_details" /> 
+                    <ui:param name="provider_search_result_id" value="complaints_provider_search_results"/>
+				</ui:include>
+			</sdc:subsection>
+		</div>
+		<div class="clear">	
+			<sdc:subsection id="comp_provider_search_results_details" title="#{msg.provider_details_title} - #{networkBean.selectedNetwork.lastName}&#160;#{networkBean.selectedNetwork.firstName}&#160;&#160;(#{networkBean.selectedNetwork.officeAddr1} - Plan: #{(not empty networkBean.selectedNetwork.plan)?networkBean.selectedNetwork.plan.planName:''}) ">
+				<ui:include src="/pages/provider/providerRowDetails.xhtml"></ui:include>
+					<div>
+					    <sdc:commandLink id="link_compl_provider_additional_details" eventName="complaints_provider_search_results_details_more" immediate="true" value="#{msg.show_additional_details}" backingBean="#{networkBean}" actionMethod="selectNetworkForMoreDetails"/>
+					</div>
+					<sdc:simpleSubsection id="compl_provider_search_results_more_details" title="#{msg.additional_details}" rendered="#{networkBean.networkAdditionalDetailsSet}">
+						<ui:include src="/pages/provider/providerDetails.xhtml" />
+					</sdc:simpleSubsection>
+				</sdc:subsection>
+			</div>
+	</sdc:section>
+	</sdc:modal>
+
+
+    <sdc:modal id="complaints_search_plan_search_modal">
+    <sdc:section id="complaints_search_plan_search" title="#{msg.complaints_plan_search_for_complaint} ##{ihcBean.incidentHeader.trackingNumber}">
+        <div class="clear">
+            <sdc:subsection id="complaints_search_plan_search_criteria" title="#{msg.complaints_search_criteria}" showCollapseExpandControl="false">
+                <ui:include src="/pages/plan/planSearchCriteria.xhtml">
+                    <ui:param name="param_plan_selection_criteria" value="#{planBean.planSelectionCriteria}" />
+                    <ui:param name="param_show_plan_type" value="true" />
+                    <ui:param name="param_show_plan_type_readonly" value="false" />
+                    <ui:param name="param_backing_bean" value="#{planBean}"/>
+                </ui:include>
+                <div class="button-set">
+                    <sdc:commandButton defaultButton="true" value="#{msg.complaints_search}" eventName="searchPlansForComplaintSearch" backingBean="#{planBean}" actionMethod="simplePlanSearch"/>
+                    <sdc:commandButton value="#{msg.complaints_reset}" eventName="complaintsSearchPlanReset" backingBean="#{planBean}" actionMethod="reset"/>
+                    
+                </div>
+            </sdc:subsection>
+        </div>
+        <div class="clear">
+            <sdc:subsection id="complaints_search_plan_search_results" title="#{msg.complaints_search_results}">
+                <ui:include src="/pages/plan/planSearchResults.xhtml">
+                    <ui:param name="param_plan_search_results_datamodel" value="#{planBean.dataModel}" />
+                    <ui:param name="param_show_plan_selection_column" value="true" />
+                    <ui:param name="param_selection_event_name" value="planSelectedFromPlanSearchForComplaintSearch" />
+                    <ui:param name="param_selection_action_bean" value="#{isearchBean}" />
+                    <ui:param name="param_selection_action_method" value="selectPlanFromPlanSearch" />
+                    <ui:param name="param_hide_plan_contract_info" value="true" />
+					<ui:param name="param_modal_id" value="complaints_search_plan_search_modal"/>
+                </ui:include>
+            </sdc:subsection>
+        </div>
+    </sdc:section>
+    </sdc:modal>
+    <sdc:modal id="complaints_search_provider_search_modal">
+    <sdc:section id="complaints_search_provider_search" title="#{msg.complaints_provider_search_for_complaint} ##{ihcBean.incidentHeader.trackingNumber}">
+        <div class="clear">
+            <sdc:subsection id="complaints_search_provider_search_criteria" title="#{msg.complaints_criteria}">
+                <t:div style="text-align: right">
+                        <sdc:commandLink id="prv_sw_adv_srch" eventName="complaints_search_provider_switch_search_type" value="#{msg.switch_to_advanced_search}"  backingBean="#{networkBean}" actionMethod="activateAdvancedSearch" rendered="#{not networkBean.advancedSearch}" focusToId="provider_provider_search_criteria_form:provider_search_criteria_provider_first_name" />&#160;&#160;
+                        <sdc:commandLink id="prv_sw_basic_srch" eventName="complaints_search_provider_switch_search_type" value="#{msg.switch_to_basic_search}"  backingBean="#{networkBean}" actionMethod="deActivateAdvancedSearch" rendered="#{networkBean.advancedSearch}" focusToId="provider_provider_search_criteria_form:provider_search_criteria_provider_first_name" />&#160;&#160;
+                </t:div>
+                <ui:include src="/pages/provider/providerSearchCriteria.xhtml">
+                    <ui:param name="paramSelectionCriteria" value="#{networkBean.networkSelectionCriteria}"></ui:param>
+                </ui:include>
+
+                <t:div style="text-align: right">
+	            	<sdc:commandLink id="show_alt_address" eventName="complaints_search_provider_switch_search_type" value="#{msg.link_use_alt_address}"  backingBean="#{networkBean}" actionMethod="enableAlternateAddress" rendered="#{(networkBean.advancedSearch) and (configPropertyBean.display_distance_search == true) and (not networkBean.networkSelectionCriteria.enableAltAddress)}"/>&#160;&#160;
+	                <sdc:commandLink id="hide_alt_address" eventName="complaints_search_provider_switch_search_type" value="#{msg.link_rem_alt_address}"  backingBean="#{networkBean}" actionMethod="disableAlternateAddress" rendered="#{(networkBean.advancedSearch) and (configPropertyBean.display_distance_search == true) and (networkBean.networkSelectionCriteria.enableAltAddress)}"/>&#160;&#160;
+		        </t:div>
+
+				<ui:include src="/pages/provider/provider_search_alt_address.xhtml">
+					<ui:param name="paramSelectionCriteria" value="#{networkBean.networkSelectionCriteria}"></ui:param>
+				</ui:include>
+
+                <div class="button-set">
+                    <sdc:commandButton defaultButton="true" value="#{msg.complaints_search}"  backingBean="#{networkBean}" actionMethod="providerSearch">
+
+                    <f:param name="param_eventNameOnError" value="complaintsCriteriaProviderReset" />
+		            <f:param name="param_eventNameOnSearch" value="complaintsCriteriaProviderSearch" />
+		                    </sdc:commandButton>
+                    
+                        <sdc:commandButton id="complaints_reset_m_5" value="#{msg.complaints_reset}" eventName="complaintsCriteriaProviderReset" backingBean="#{networkBean}" actionMethod="resetButtonAction"/>
+                    
+                </div>
+            </sdc:subsection>
+        </div>
+        <div class="clear">
+            <sdc:subsection id="complaints_search_provider_search_results" title="#{msg.complaints_results}">
+                <ui:include src="/pages/provider/providerSearchResults.xhtml">
+                    <ui:param name="provider_results_hide_details" value="true" />
+                    <ui:param name="param_provider_results_hide_select" value="true"/>
+                    <ui:param name="provider_results_selection_backing_bean" value="#{isearchBean}" />
+                    <ui:param name="provider_results_selection_action_method" value="selectProviderFromProviderSearch" />
+                    <ui:param name="param_provider_search_results_selection_message" value="#{msg.action_select}" />
+                    <ui:param name="provider_results_selection_event_name" value="providerSelectedFromProviderSearchForComplaintSearch" />
+                    <ui:param name="param_provider_search_tag_enabled" value="false"/>
+					<ui:param name="param_modal_id" value="complaints_search_provider_search_modal"/>
+					<ui:param name="search_results_details_section_id" value="comp_provider_search_results_details_ise" />
+                    <ui:param name="param_provider_provider_search_results_details" value="complaints_provider_search_results_details_ise" /> 
+                    <ui:param name="provider_search_result_id" value="complaints_search_provider_search_results"/>
+                </ui:include>
+            </sdc:subsection>
+        </div>
+        <div class="clear">
+			<sdc:subsection id="comp_provider_search_results_details_ise"  title="#{msg.provider_details_title} - #{networkBean.selectedNetwork.lastName}&#160;#{networkBean.selectedNetwork.firstName}&#160;&#160;(#{networkBean.selectedNetwork.officeAddr1} - Plan: #{(not empty networkBean.selectedNetwork.plan)?networkBean.selectedNetwork.plan.planName:''}) ">
+				<ui:include src="/pages/provider/providerRowDetails.xhtml"></ui:include>
+					<div>
+					    <sdc:commandLink id="link_compl_provider_additional_details_ise" eventName="complaints_provider_search_results_details_more_ise" immediate="true" value="#{msg.show_additional_details}" backingBean="#{networkBean}" actionMethod="selectNetworkForMoreDetails"/>
+					</div>
+					<sdc:simpleSubsection id="compl_provider_search_results_more_details_ise" title="#{msg.additional_details}" rendered="#{networkBean.networkAdditionalDetailsSet}">
+						<ui:include src="/pages/provider/providerDetails.xhtml" />
+					</sdc:simpleSubsection>
+			</sdc:subsection>
+		</div>
+    </sdc:section>
+    </sdc:modal>
+
+    <sdc:panelGroup id="panelComplaintsEnrollment">
+    	<ui:include src="/pages/enrollment/enrollment.xhtml">
+    		<ui:param name="param_cancel_enrollment_selection_event" value="complaintCancelProcessNewEnrollment"/>
+    	</ui:include>
+    </sdc:panelGroup>
+    <div class="section-group">
+        <sdc:section id="complaints_denied_ee_request_history" title="#{msg.complaints_denied_ee_requests}">
+            <ui:include src="/pages/exempt/eeSearchResults.xhtml">
+               <ui:param name="param_ee_search_results_datamodel" value="#{ihcBean.exemptionExclusionResultDataModel}" />
+               <ui:param name="param_participant_name" value="false" />
+               <ui:param name="param_selection_action_bean" value="#{ihcBean}"/>
+               <ui:param name="param_selection_action_method" value="selectEERequestForAppeal"/>
+               <ui:param name="param_selection_event" value="complaintsSelectEERequestForAppeal"/>
+            </ui:include>
+            <div class="button-set">
+                <p:fragment>
+                    <sdc:commandButton eventName="complaintsCancelLinkEERequestForAppeal" value="#{msg.complaints_cancel}" immediate="true"/>
+                </p:fragment>
+            </div>
+        </sdc:section>
+        <sdc:section id="complaints_ee_request_history" title="#{msg.complaints_ee_requests}">
+            <ui:include src="/pages/exempt/eeSearchResults.xhtml">
+               <ui:param name="param_ee_search_results_datamodel" value="#{ihcBean.exemptionExclusionResultDataModel}" />
+               <ui:param name="param_participant_name" value="false" />
+               <ui:param name="param_selection_action_bean" value="#{ihcBean}"/>
+               <ui:param name="param_selection_action_method" value="selectEERequestForComplaint"/>
+               <ui:param name="param_selection_event" value="complaintsSelectEERequestForComplaint"/>
+            </ui:include>
+            <div class="button-set">
+                <p:fragment>
+                    <sdc:commandButton eventName="complaintsCreateEERequestForComplaintFromHistory" value="#{msg.complaints_create_new_ee_request}" immediate="true" backingBean="#{ihcBean}" actionMethod="initCreateEERequest" permission="section.complaints_ee_details_section.create"/>
+                    <sdc:commandButton eventName="complaintsCancelLinkEERequestForComplaint" value="#{msg.complaints_cancel}" immediate="true"/>
+                </p:fragment>
+            </div>
+        </sdc:section>
+        <sdc:section id="complaints_ee_details_section" title="#{exemptionExclusionBean.detailSectionTitle} - #{exemptionExclusionBean.exemptionExclusionRequest.client.extClientId}  #{exemptionExclusionBean.exemptionExclusionRequest.client.lastName}, #{exemptionExclusionBean.exemptionExclusionRequest.client.firstName}">
+            <ui:include src="/pages/exempt/eeDetails.xhtml">
+            	<ui:param name="param_suffix" value="task_ee_complaints_subsection"/>
+                <ui:param name="param_cancel_event" value="complaintsCancelCreateEERequestForComplaint"/>
+                <ui:param name="param_case_updatable" value="true"/>
+                <ui:param name="param_save_event" value="complaintsSaveCreateEERequestForComplaint"/>
+                <ui:param name="param_save_backing_bean" value="#{ihcBean}"/>
+                <ui:param name="param_save_action_method" value="saveEERequest"/>
+            </ui:include>
+        </sdc:section>
+	    <sdc:modal id="ee_provider_search_modal">
+	        <ui:include src="/pages/exempt/ee_provider_search_results_details.xhtml">
+	            <ui:param name="provider_results_selection_backing_bean" value="#{sectionBean}" />
+	            <ui:param name="provider_results_selection_action_method" value="processModalSelectAction" />
+	            <ui:param name="param_network_search_no_criteria_check" value="true" />
+	            <ui:param name="param_providerProviderSearch" value="ee_providerProviderSearch" />
+	            <ui:param name="param_providerProviderReset" value="ee_providerProviderReset" />
+	            <ui:param name="param_provider_advanced_search" value="ee_provider_switch_search_type" />
+	            <ui:param name="provider_results_selection_event_name" value="" />
+				<ui:param name="param_modal_id" value="ee_provider_search_modal"/>
+	        </ui:include>
+	    </sdc:modal>
+
+		<sdc:modal id="staff_search_modal">
+			<ui:include src="/pages/sysadmin/staff_search_result_modal.xhtml">
+				<ui:param name="param_staff_select_event_name" value="resetComplaints"/>
+				<ui:param name="param_staff_select_backing_bean" value="#{isearchBean}"/>
+				<ui:param name="param_modal_id" value="staff_search_modal"/>
+			</ui:include>
+		</sdc:modal>
+
+    </div>
+<!-- END PAGES/COMPLAINTS/COMPLAINTS.xhtml -->
+</ui:composition>
