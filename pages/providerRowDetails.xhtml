@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core" xmlns:t="http://myfaces.apache.org/tomahawk" xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jstl/core"
+    xmlns:sdc="http://www.maximus.com/sdc/jsf" xmlns:sdcf="http://www.maximus.com/sdc/functions" version="2.0">
+
+    <html xmlns="http://www.w3.org/1999/xhtml">
+        <h:body >
+            <ui:composition>
+            	<div class="persistent-content">
+            	<sdc:grid columnCount="4" displayValueOnly="true" rendered="#{not empty networkBean.selectedNetwork}">
+                    <sdc:selectBooleanCheckboxField id="prov_rd_f1" label="#{msg.provider_search_results_wheelchair_access}" value="#{networkBean.selectedNetwork.wheelChairAccessibleInd}" rendered="#{not empty networkBean.selectedNetwork.wheelChairAccessibleInd}"/>
+                    <sdc:outputTextField label="#{msg.provider_search_results_wheelchair_access}" value="" rendered="#{empty networkBean.selectedNetwork.wheelChairAccessibleInd}"/>
+                    <sdc:selectBooleanCheckboxField id="prov_rd_f2" label="#{msg.provider_search_results_accepts_ob}" value="#{networkBean.selectedNetwork.acceptsObstetricsInd}" />
+					<sdc:selectBooleanCheckboxField id="prov_rd_f3" label="#{msg.provider_search_results_women_only}" value="#{networkBean.selectedNetwork.womenOnlyInd}" />
+                    <sdc:selectOneMenuField id="prov_rd_f4" label="#{msg.provider_search_results_sex_limits}" value="#{networkBean.selectedNetwork.sexLimitsCd}" displayValueOnly="true" selectItems="#{code.EnumProviderSexLimits}" />
+                    <sdc:selectOneMenuField id="prov_rd_f5" label="#{msg.provider_search_results_provider_gender}" value="#{networkBean.selectedNetwork.providerGenderCd}" displayValueOnly="true" selectItems="#{code.EnumGender}"/>
+					<sdc:selectOneMenuField id="prov_rd_f6" label="#{msg.provider_search_results_panel_hold}" value="#{networkBean.selectedNetwork.panelLimit.holdCd}" displayValueOnly="true" selectItems="#{code.EnumPanelHold}"/>
+					<sdc:outputTextField label="#{msg.provider_search_results_panel_limit}" value="#{networkBean.selectedNetwork.panelLimit.panelSize}" />
+					<sdc:outputTextField label="#{msg.current_enrollments}" value="#{networkBean.selectedNetwork.panelLimit.enrolledCount}" />
+                    <sdc:selectOneMenuField id="prov_rd_f7" label="#{msg.provider_search_results_accepting_clients_mco}" value="#{networkBean.selectedNetwork.acceptingNewClientsMcoCd}" selectItems="#{code.EnumNetworkAcceptPcp}" displayValueOnly="true"/>
+                    <sdc:selectOneMenuField id="prov_rd_f8" label="#{msg.provider_search_results_accepting_clients_pcp}" value="#{networkBean.selectedNetwork.acceptingNewClientsPcpCd}" selectItems="#{code.EnumNetworkAcceptPcp}" displayValueOnly="true"/>
+                    <sdc:outputTextField label="#{msg.provider_search_results_phone}" value="#{networkBean.selectedNetwork.officePhone}" format="phone" />
+				    <sdc:outputTextField label="#{msg.provider_search_results_provider_location}" value="#{networkBean.selectedNetwork.locationCd}" />
+                    <sdc:outputTextField label="#{msg.provider_search_results_medicaid_id}" value="#{networkBean.selectedNetwork.medicaidIdExt}" />
+                    <sdc:outputTextField label="#{msg.provider_search_criteria_provider_id}" value="#{networkBean.selectedNetwork.providerIdExt}" />
+					<sdc:selectOneMenuField id="prov_rd_f10" label="#{msg.provider_search_criteria_provider_classification}" value="#{networkBean.selectedNetwork.provider.classificationCd}" displayValueOnly="true" selectItems="#{code.EnumProviderClassification}"/>
+                    <sdc:selectOneMenuField id="prov_rd_f11" label="Region" value="#{sdcf:getAttrForCode('EnumCounty',networkBean.selectedNetwork.officeCounty,'attribDistrictCd')}" displayValueOnly="true" selectItems="#{code.EnumDistrict}"/>
+                    <sdc:selectOneMenuField id="prov_rd_f12" label="#{msg.status}" value="#{networkBean.selectedNetwork.statusCd}" displayValueOnly="true" selectItems="#{code.EnumProviderStatus}"/>
+                    <sdc:outputTextField label="Network ID" value="#{networkBean.selectedNetwork.networkIdExt}" />
+                    <sdc:outputTextField label="#{msg.provider_search_results_license_number}" value="#{networkBean.selectedNetwork.licenseNumber}" rendered="#{configPropertyBean.provider_detail_show_provider_license_number == 'true'}"/>
+                    <sdc:outputDateField label="#{msg.provider_search_results_generic_field1_date}" value="#{networkBean.selectedNetwork.networkGenericField1Date}" />
+                    <sdc:outputDateField label="#{msg.provider_search_results_generic_field2_date}" value="#{networkBean.selectedNetwork.networkGenericField2Date}" />
+                    <sdc:outputTextField label="#{msg.provider_search_results_generic_field3_num}" value="#{networkBean.selectedNetwork.networkGenericField3Num}" />
+                    <sdc:outputTextField label="#{msg.provider_search_results_generic_field4_num}" value="#{networkBean.selectedNetwork.networkGenericField4Num}" />
+                    <sdc:outputTextField label="#{msg.provider_search_results_generic_field5}" value="#{networkBean.selectedNetwork.networkGenericField5Txt}"/>
+                    <sdc:outputTextField label="#{msg.provider_search_results_generic_field6}" value="#{networkBean.selectedNetwork.networkGenericField6Txt}"/>
+                    <sdc:outputTextField label="#{msg.provider_search_results_generic_field7}" value="#{networkBean.selectedNetwork.networkGenericField7Txt}"/>
+                    <sdc:outputTextField label="#{msg.provider_search_results_generic_field8}" value="#{networkBean.selectedNetwork.networkGenericField8Txt}"/>
+                    <sdc:outputTextField label="#{msg.provider_search_results_generic_field9}" value="#{networkBean.selectedNetwork.networkGenericField9Txt}"/>
+                    <sdc:outputTextField label="#{msg.provider_search_results_generic_field10}" value="#{networkBean.selectedNetwork.networkGenericField10Txt}"/>
+                    <sdc:outputTextField label="#{msg.provider_search_results_generic_ref11_id}" value="#{networkBean.selectedNetwork.networkGenericRef11Id}" />
+                    <sdc:outputTextField label="#{msg.provider_search_results_generic_ref12_id}" value="#{networkBean.selectedNetwork.networkGenericRef12Id}" />
+            	</sdc:grid>
+                <sdc:grid columnCount="1" displayValueOnly="true" rendered="#{not empty networkBean.selectedNetwork}">
+                    <sdc:simpleDataTable id="prov_rd_f9" rows="0" value="#{networkBean.selectedNetworkProviderTypes}">
+                        <sdc:column headerValue="#{msg.provider_provider_types}">
+                            <sdc:selectOneMenu id="eligType" value="#{row.providerTypeCd}" selectItems="#{code.EnumProviderType}" displayValueOnly="true"/>
+                        </sdc:column>
+                    </sdc:simpleDataTable>
+                </sdc:grid>
+                </div>            	
+            </ui:composition>
+        </h:body>
+    </html>
+</jsp:root>
