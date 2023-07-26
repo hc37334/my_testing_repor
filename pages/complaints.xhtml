@@ -13,18 +13,7 @@
 					<ui:include src="/pages/complaints/complaints_search_criteria.xhtml"/>
 				</sdc:subsection>
 			</div> 
-			<div class="clear">
-				<sdc:subsection id="incident_headers_search_results" title="#{msg.complaints_search_results}" showCollapseExpandControl="false">
-					<ui:include src="/pages/complaints/complaints_search_results.xhtml"/>
-					<h:panelGroup rendered="#{showReadOnly != 'true'}" >
-						<div class="button-set">
-							<p:fragment>
-								<sdc:commandButton eventName="createNewIncidentHeader" value="#{msg.complaints_new_complaint}" backingBean="#{isearchBean}" actionMethod="createNewIncidentHeader" immediate="true" focusToId="selected_complaint_form:stateReceivedDate" permission="section.selected_complaint.create"/>
-							</p:fragment>
-						</div>
-					</h:panelGroup>
-				</sdc:subsection>
-			</div>
+			
 			<sdc:focusForSection focusId="caseId"/>
 		</sdc:section>
 		<sdc:section id="selected_complaint" title="#{msg.complaints_complaint} ##{ihcBean.incidentHeader.trackingNumber}" rendered="#{not empty ihcBean.incidentHeader}">
